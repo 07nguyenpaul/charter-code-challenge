@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { AccordionSkeleton } from 'carbon-components-react'
+import { DataTableSkeleton } from 'carbon-components-react'
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
@@ -11,6 +11,8 @@ export class Dashboard extends Component {
   componentDidMount() {
     this.props.fetchRestaurantData();
   }
+
+  static getInitialProps
 
   renderTableColumns = () => {
     const columnNames = [
@@ -27,7 +29,24 @@ export class Dashboard extends Component {
     ))
   }
 
+  alphabetizeRestaurantNames = () => {
+    return this.props.restaurants.sort((a, b) => {
+      let firstRest = a.name.toUpperCase();
+      let secondRest = b.name.toUpperCase();
+
+      if (firstRest < secondRest) {
+        return -1;
+      }
+      if (firstRest > secondRest) {
+        return 1;
+      }
+      return 0;
+    });
+  }
+
   renderTableRows = () => {
+    this.alphabetizeRestaurantNames();
+
     return this.props.restaurants.map(restaurant => (
       <tr key={restaurant.id}>
         <td>{restaurant.name}</td>
@@ -46,7 +65,7 @@ export class Dashboard extends Component {
     return (
       <div className="dashboard">
         <h1 className="dashboard--device-title">Restaurants</h1>
-        {loading ? (<AccordionSkeleton count={5} open/>) : (
+        {loading ? (<DataTableSkeleton columnCount={6} rowCount={10} open/>) : (
           <table>
             <thead>
               <tr>
