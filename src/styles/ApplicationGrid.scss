@@ -1,0 +1,8 @@
+@import './_mixins/_variables';
+
+.application-grid {
+  background: $primary-gray;
+  display: grid;
+  grid-template-rows: auto auto;
+  min-height: 100vh;
+}

@@ -1,0 +1,9 @@
+@import './_mixins/_variables';
+
+.footer {
+  align-self: flex-end;
+  display: flex;
+  grid-row: 2/-1;
+  height: 40px;
+  padding: 8px;
+}

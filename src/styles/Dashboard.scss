@@ -1,0 +1,32 @@
+@import './_mixins/_variables';
+
+.dashboard {
+  align-content: start;
+  background: $primary-white;
+  display: grid;
+  grid-gap: 16px;
+  grid-row: 1/2;
+  margin: 4% 0;
+  padding: 2%;
+
+  .dashboard--title {
+    font-weight: 500px;
+  }
+
+  table,
+  td,
+  th {
+    border: 1px solid #333;
+  }
+
+  th, td {
+   max-width: 80px;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+    overflow: hidden;
+  }
+
+  td {
+    padding-left: 6px;
+  }
+}
