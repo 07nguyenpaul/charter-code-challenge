@@ -20,10 +20,13 @@ const PaginationItem = styled.li`
   color: #00a7e1;
   font-size 14px;
   &:first-child {
-    border-radius: 3px 0 0 3px;
+    border-radius: 2px 0 0 2px;
   }
   &:last-child {
-    border-radius: 0 3px 3px 0;
+    border-radius: 0 2px 2px 0;
+  }
+  &:only-child {
+    border-radius: 2px;
   }
   a {
     text-decoration: none;
@@ -35,7 +38,6 @@ const PaginationItem = styled.li`
 
 const Pagination = ({ currentPage, paginate, restaurantsPerPage, totalRestaurants }) => {
   const pageNum = [];
-
   for (var i = 1; i <= Math.ceil(totalRestaurants / restaurantsPerPage); i++) {
     pageNum.push(i);
   };

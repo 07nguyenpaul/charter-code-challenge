@@ -29,4 +29,13 @@
   td {
     padding-left: 6px;
   }
+
+  .bx--dropdown__wrapper {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .dashboard__dropdown--states {
+    width: 10%;
+  }
 }
