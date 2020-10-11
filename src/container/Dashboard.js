@@ -1,20 +1,32 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DataTableSkeleton } from 'carbon-components-react'
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 
-import { fetchRestaurantData } from '../actions/restaurants';
+import Pagination from '../components/Pagination';
+import RestaurantData from '../service/fetchData';
 
 import '../styles/Dashboard.scss';
 
-export class Dashboard extends Component {
-  componentDidMount() {
-    this.props.fetchRestaurantData();
-  }
+const Dashboard = () => {
+  const [restaurants, setRestaurants] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [restaurantsPerPage] = useState(10);
 
-  static getInitialProps
+  // Fetch restaurant data
+  useEffect(() => {
+    const fetchRest = async () => {
+      setLoading(true);
+      const res = await RestaurantData.fetchRestaurantData();
+      setRestaurants(res);
+      setLoading(false);
+    };
 
-  renderTableColumns = () => {
+    fetchRest();
+  }, []);
+
+  // Render table columns
+  const renderTableColumns = () => {
     const columnNames = [
       "Name",
       "City",
@@ -29,8 +41,9 @@ export class Dashboard extends Component {
     ))
   }
 
-  alphabetizeRestaurantNames = () => {
-    return this.props.restaurants.sort((a, b) => {
+  // Alphabetize restaurant names before initial render
+  const alphabetizeRestaurantNames = () => {
+    return restaurants.sort((a, b) => {
       let firstRest = a.name.toUpperCase();
       let secondRest = b.name.toUpperCase();
 
@@ -44,10 +57,16 @@ export class Dashboard extends Component {
     });
   }
 
-  renderTableRows = () => {
-    this.alphabetizeRestaurantNames();
+  // Render table rows with restaurant data
+  const renderTableRows = () => {
+    let alphaRestList = [];
+    alphaRestList = alphabetizeRestaurantNames();
 
-    return this.props.restaurants.map(restaurant => (
+    const indexOfLastRestaurant = currentPage * restaurantsPerPage;
+    const indexOfFirstRestaurant = indexOfLastRestaurant - restaurantsPerPage;
+    const currentRestaurants = alphaRestList.slice(indexOfFirstRestaurant, indexOfLastRestaurant);
+
+    return currentRestaurants.map(restaurant => (
       <tr key={restaurant.id}>
         <td>{restaurant.name}</td>
         <td>{restaurant.city}</td>
@@ -59,43 +78,37 @@ export class Dashboard extends Component {
     ))
   }
 
-  render() {
-    const { loading } = this.props;
+  // Handle pagination
+  const handlePagination = pageNum => setCurrentPage(pageNum);
 
-    return (
-      <div className="dashboard">
-        <h1 className="dashboard--device-title">Restaurants</h1>
-        {loading ? (<DataTableSkeleton columnCount={6} rowCount={10} open/>) : (
-          <table>
-            <thead>
-              <tr>
-                {this.renderTableColumns()}
-              </tr>
-            </thead>
-            <tbody>
-              {this.renderTableRows()}
+  return (
+    <div className="dashboard">
+      <h1 className="dashboard--device-title">Restaurants</h1>
+      {loading ? (<DataTableSkeleton columnCount={6} rowCount={10} open/>) : (
+        <table>
+          <thead>
+            <tr>
+              {renderTableColumns()}
+            </tr>
+          </thead>
+          <tbody>
+            {renderTableRows()}
           </tbody>
-          </table>
-        )}
-      </div>
-    )
-  }
-}
+        </table>
+      )}
+      <Pagination
+        currentPage={currentPage}
+        paginate={handlePagination}
+        restaurantsPerPage={restaurantsPerPage}
+        totalRestaurants={restaurants.length}
+        />
+    </div>
+  );
+};
 
 Dashboard.propTypes = {
   fetchRestaurantData: PropTypes.func,
   loading: PropTypes.bool,
 };
 
-function mapStateToProps(state) {
-  return {
-    restaurants: state.restaurants.restaurants,
-    loading: state.restaurants.requesting,
-  };
-}
-
-const mapDispatchToProps = {
-  fetchRestaurantData
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
+export default Dashboard;
