@@ -1,6 +1,6 @@
 ## Charter Code Challenge Application
 
-Application is deployed through [Heroku](https://charter-restaurant-cc.herokuapp.com/)
+Application is deployed through [Heroku](https://charter-cc.herokuapp.com/)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
