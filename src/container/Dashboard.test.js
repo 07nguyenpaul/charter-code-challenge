@@ -6,14 +6,12 @@ import { Provider } from 'react-redux';
 import {spy} from 'sinon';
 
 import {Dashboard} from './Dashboard';
-import { fetchRestaurantData, getForcast } from '../actions/restaurants';
 import { getMockRestaurants } from '../store/mockRestaurants';
 import configureStore from '../store/configureStore';
 
 configure({ adapter: new Adapter() });
 
 describe('Container: Dashboard ', () => {
-  spy(Dashboard.prototype, 'componentDidMount');
   const props = {
     restaurants: getMockRestaurants(),
     loading: false,
