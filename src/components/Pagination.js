@@ -16,9 +16,12 @@ const PaginationList = styled.ul`
 
 const PaginationItem = styled.li`
   border: 1px solid black;
-  padding: 4px;
   color: #00a7e1;
-  font-size 14px;
+  font-size: 16px;
+  height: 42px;
+  padding: 11px 15px;
+  text-align: center;
+  width: 48px;
   &:first-child {
     border-radius: 2px 0 0 2px;
   }
@@ -34,6 +37,9 @@ const PaginationItem = styled.li`
   &:hover:not(.page-number--active) {
     background-color: #ddd;
   }
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 const Pagination = ({ currentPage, paginate, restaurantsPerPage, totalRestaurants }) => {
@@ -46,8 +52,8 @@ const Pagination = ({ currentPage, paginate, restaurantsPerPage, totalRestaurant
     <nav>
       <PaginationList className="pagination">
         {pageNum.map(number => (
-          <PaginationItem key={number} className={currentPage === number ? "page-number--active" : "page-number"}>
-            <a onClick={() => paginate(number)} href='!#' className="page-link">
+          <PaginationItem key={number} className={currentPage === number ? "page-number--active" : "page-number"} onClick={() => paginate(number)}>
+            <a href='!#' className="page-link">
               {number}
             </a>
           </PaginationItem>

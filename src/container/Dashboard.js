@@ -72,7 +72,7 @@ const Dashboard = () => {
         <td>{restaurant.city}</td>
         <td>{restaurant.state}</td>
         <td>{restaurant.telephone}</td>
-        <td>{restaurant.website}</td>
+        <td><a href={restaurant.website}>{restaurant.name}</a></td>
         <td>{restaurant.genre}</td>
       </tr>
     ))
@@ -185,28 +185,30 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      <h1 className="dashboard--device-title">Restaurants</h1>
       <span className="dashboard__dropdown--container">
-        {loading ? (<DropdownSkeleton />) : (
-          <Dropdown
-            id="dashboard__dropdown--states"
-            className="dashboard__dropdown--states dashboard__dropdown"
-            label="Select state"
-            items={states}
-            itemToString={(item) => (item ? item.label : '')}
-            onChange={e => handleStateSelection(e)}
-          />
-        )}
-        {loading ? (<DropdownSkeleton />) : (
-          <Dropdown
-            id="dashboard__dropdown--genre"
-            className="dashboard__dropdown--genre dashboard__dropdown"
-            label="Select genre"
-            items={genres}
-            itemToString={(item) => (item ? item.label : '')}
-            onChange={e => handleGenreSelection(e)}
-          />
-        )}
+        <h1 className="dashboard--device-title">Restaurants</h1>
+        <div className="dashboard__filter--container">
+          {loading ? (<DropdownSkeleton />) : (
+            <Dropdown
+              id="dashboard__dropdown--states"
+              className="dashboard__dropdown--states dashboard__dropdown"
+              label="Select state"
+              items={states}
+              itemToString={(item) => (item ? item.label : '')}
+              onChange={e => handleStateSelection(e)}
+            />
+          )}
+          {loading ? (<DropdownSkeleton />) : (
+            <Dropdown
+              id="dashboard__dropdown--genre"
+              className="dashboard__dropdown--genre dashboard__dropdown"
+              label="Select genre"
+              items={genres}
+              itemToString={(item) => (item ? item.label : '')}
+              onChange={e => handleGenreSelection(e)}
+            />
+          )}
+        </div>
       </span>
       {loading ? (<DataTableSkeleton columnCount={6} rowCount={5} open/>) : (
         <table>

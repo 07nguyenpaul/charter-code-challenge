@@ -19,15 +19,35 @@
     border: 1px solid #333;
   }
 
+  thead {
+    background-color: #e0e0e0;
+  }
+
+  tbody {
+    background-color: #f4f4f4;
+    height: 48px;
+  }
+
+  th {
+    height: 3rem;
+    padding: 16px;
+    text-align: left;
+    vertical-align: middle;
+    font-weight: 700;
+  }
+
   th, td {
-   max-width: 80px;
-   text-overflow: ellipsis;
-   white-space: nowrap;
+    max-width: 80px;
     overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   td {
-    padding-left: 6px;
+    padding: 16px;
+    a {
+      text-decoration: none;
+    }
   }
 
   .bx--dropdown__wrapper {
@@ -37,6 +57,11 @@
 
   .dashboard__dropdown--container {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+
+    .dashboard__filter--container {
+      align-items: center;
+      display: flex;
+    }
   }
 }
