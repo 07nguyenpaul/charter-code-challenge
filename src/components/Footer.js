@@ -3,7 +3,7 @@ import '../styles/Header.scss';
 
 const Footer = () => (
   <div className="footer">
-    © 2020 Let's eat gooood
+    © 2020 Charter
   </div>
 );
 
