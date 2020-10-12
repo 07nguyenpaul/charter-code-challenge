@@ -31,11 +31,12 @@
   }
 
   .bx--dropdown__wrapper {
-    display: flex;
-    justify-content: flex-end;
+    margin: 0 6px;
+    min-width: 140px;
   }
 
-  .dashboard__dropdown--states {
-    width: 10%;
+  .dashboard__dropdown--container {
+    display: flex;
+    justify-content: flex-end;
   }
 }

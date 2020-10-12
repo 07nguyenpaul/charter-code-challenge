@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { DataTableSkeleton, Dropdown, DropdownSkeleton } from 'carbon-components-react'
 import PropTypes from 'prop-types';
 
-import { states } from '../constants';
+import { states, genres } from '../constants';
 import Pagination from '../components/Pagination';
 import RestaurantData from '../service/fetchData';
 
@@ -12,8 +12,9 @@ const Dashboard = () => {
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [stateSelection, setStateSelection] = useState({label: "", abbr: ""});
+  const [filterSelection, setStateSelection] = useState({label: "", abbr: "", genre: ""});
   const [filterRestBasedOnState, setRestBasedOnState] = useState([]);
+  const [filterList, setFilterList] = useState([]);
   const [restaurantsPerPage] = useState(10);
 
   // Fetch restaurant data
@@ -84,12 +85,12 @@ const Dashboard = () => {
     const indexOfLastRestaurant = currentPage * restaurantsPerPage;
     const indexOfFirstRestaurant = indexOfLastRestaurant - restaurantsPerPage;
 
-    if (restaurants && restaurants.length > 0 && !stateSelection.abbr) {
+    if (restaurants && restaurants.length > 0 && !filterSelection.abbr) {
       alphaRestList = alphabetizeRestaurantNames();
       const currentRestaurants = alphaRestList.slice(indexOfFirstRestaurant, indexOfLastRestaurant);
 
       return showRestaurantData(currentRestaurants);
-    } else if (filterRestBasedOnState && filterRestBasedOnState.length > 0 && stateSelection.abbr) {
+    } else if (filterRestBasedOnState && filterRestBasedOnState.length > 0 && filterSelection.abbr) {
       alphaRestList = alphabetizeRestaurantNames();
       const currentRestaurants = alphaRestList.slice(indexOfFirstRestaurant, indexOfLastRestaurant);
 
@@ -97,7 +98,7 @@ const Dashboard = () => {
     } else {
       return (
         <tr>
-          <td colSpan="6">No Results found in {stateSelection.label}. Select another state.</td>
+          <td colSpan="6">No Results found in {filterSelection.label}. Select another state.</td>
         </tr>
       );
     }
@@ -107,38 +108,94 @@ const Dashboard = () => {
   const handlePagination = pageNum => setCurrentPage(pageNum);
 
   // Filter by state
-  const handleStateSelection = (e) => {
+  const handleStateSelection = async (e) => {
     let selectedState = e.selectedItem.abbr;
 
     if(selectedState === "ALL") {
+      setStateSelection({...filterSelection, label: "", abbr: ""});
       setRestBasedOnState([]);
-      setStateSelection({label: "", abbr: ""});
-
-      return restaurants;
     } else {
       const filtered = restaurants.filter(state => selectedState === state.state);
 
-      setStateSelection({label: e.selectedItem.label, abbr: e.selectedItem.abbr});
+      setStateSelection({...filterSelection, label: e.selectedItem.label, abbr: e.selectedItem.abbr});
+      setCurrentPage(1);
       setRestBasedOnState(filtered);
     }
   }
 
   // Filter by genre
+  const handleGenreSelection = (value) => {
+    const selectedGenre = value && value.selectedItem ? value.selectedItem.label : value;
+    // NOT REALLY WORKING
+    if (selectedGenre && filterSelection.label === "" &&  filterSelection.abbr === "") {
+      // console.log('inside first if in handleGenreSelection()');
+      const filtered = restaurants.filter(function(obj) {
+        // console.log(obj);
+        return Object.keys(obj).some(function(key) {
+          let searchObject = obj[key].includes(selectedGenre)
+          if (!searchObject) {
+            return 0;
+          } else {
+            return searchObject;
+          }
+        })
+      })
+
+      setCurrentPage(1);
+      return setFilterList(filtered);
+    } else if(selectedGenre === "All") {
+      setFilterList([]);
+      setStateSelection({...filterSelection, genre: ""});
+
+      return restaurants;
+    } else {
+      const FL =
+        filterSelection.label && filterSelection.abbr ? filterRestBasedOnState : restaurants;
+        // console.log('new list to filter by', FL);
+
+      const filtered = FL.filter(function(obj) {
+        // console.log(obj);
+        return Object.keys(obj).some(function(key) {
+          let searchObject = obj[key].includes(selectedGenre)
+          if (!searchObject) {
+            return 0;
+          } else {
+            return searchObject;
+          }
+        })
+      })
+      setStateSelection({...filterSelection, genre: selectedGenre});
+      setCurrentPage(1);
+      return setFilterList(filtered);
+    }
+  }
 
   return (
     <div className="dashboard">
       <h1 className="dashboard--device-title">Restaurants</h1>
-      {loading ? (<DropdownSkeleton />) : (
-        <Dropdown
-          id="dashboard__dropdown--states"
-          className="dashboard__dropdown--states"
-          label="Select state"
-          items={states}
-          itemToString={(item) => (item ? item.label : '')}
-          onChange={e => handleStateSelection(e)}
-        />
-      )}
-      {loading ? (<DataTableSkeleton columnCount={6} rowCount={10} open/>) : (
+      <span className="dashboard__dropdown--container">
+        {loading ? (<DropdownSkeleton />) : (
+          <Dropdown
+            id="dashboard__dropdown--states"
+            className="dashboard__dropdown--states dashboard__dropdown"
+            label="Select state"
+            items={states}
+            itemToString={(item) => (item ? item.label : '')}
+            onChange={e => handleStateSelection(e)}
+          />
+        )}
+        {loading ? (<DropdownSkeleton />) : (
+          <Dropdown
+            id="dashboard__dropdown--genre"
+            className="dashboard__dropdown--genre dashboard__dropdown"
+            label="Select genre"
+            items={genres}
+            itemToString={(item) => (item ? item.label : '')}
+            onChange={e => handleGenreSelection(e)}
+          />
+        )}
+      </span>
+      {loading ? (<DataTableSkeleton columnCount={6} rowCount={5} open/>) : (
         <table>
           <thead>
             <tr>
@@ -154,7 +211,7 @@ const Dashboard = () => {
         currentPage={currentPage}
         paginate={handlePagination}
         restaurantsPerPage={restaurantsPerPage}
-        totalRestaurants={stateSelection.abbr ? filterRestBasedOnState.length : restaurants.length}
+        totalRestaurants={filterSelection.abbr ? filterRestBasedOnState.length : restaurants.length}
         />
     </div>
   );
