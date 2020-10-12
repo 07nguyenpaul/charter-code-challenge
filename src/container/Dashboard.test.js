@@ -1,11 +1,8 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import { renderHook } from '@testing-library/react-hooks';
-import { act } from 'react-test-renderer';
+import { renderHook, act } from '@testing-library/react-hooks';
 import { configure, shallow, mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-// import { Provider } from 'react-redux';
-// import {spy} from 'sinon';
 
 import Dashboard from './Dashboard';
 import RestaurantData from '../service/fetchData';
@@ -34,10 +31,6 @@ describe('Container: Dashboard ', () => {
     loading: false,
     currentPage: 1,
     restaurantsPerPage: 10,
-    setRestaurants: jest.fn(),
-    // renderTableRows: jest.fn(),
-    // renderTableColumns: jest.fn(),
-    // fetchRestaurantData: jest.fn(),
   }
 
   let wrapper;
@@ -59,7 +52,11 @@ describe('Container: Dashboard ', () => {
     expect(wrapper.find('DataTableSkeleton').length).toBe(1);
   });
 
-  it('should fetch restaurant data with useEffect hook', async () => {
+  xit('should fetch restaurant data with useEffect hook', async () => {
+    global.fetch = jest.fn();
+
+    await act(async () => renderHook(() => Dashboard));
+    expect(global.fetch).toBeCalledWith("https://code-challenge.spectrumtoolbox.com/api/restaurants");
   });
 
   it('should render 6 table columns', () => {
@@ -70,7 +67,15 @@ describe('Container: Dashboard ', () => {
     expect(wrapper.find('Dropdown').length).toBe(2);
   });
 
+  xit('test state filter selection', () => {
+  });
+
+  xit('test genre filter selection', () => {
+  });
+
   xit('should render restaurants', () => {
+    const {result} = renderHook(Dashboard)
+
     act(() => {
       // Set restaurant state here
     });
@@ -78,5 +83,8 @@ describe('Container: Dashboard ', () => {
 
   it('should render Pagination', () => {
     expect(wrapper.find('Pagination').prop("currentPage")).toBe(1);
+  });
+
+  xit('test pagination ', () => {
   });
 });
