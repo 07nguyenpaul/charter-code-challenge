@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { DataTableSkeleton, Dropdown, DropdownSkeleton } from 'carbon-components-react'
+import { DataTableSkeleton, Dropdown, DropdownSkeleton, SkeletonText } from 'carbon-components-react'
+import { Close16, Search16 } from '@carbon/icons-react';
 import PropTypes from 'prop-types';
 
 import { states, genres } from '../constants';
@@ -9,13 +10,14 @@ import RestaurantData from '../service/fetchData';
 import '../styles/Dashboard.scss';
 
 const Dashboard = () => {
-  const [restaurants, setRestaurants] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [filterSelection, setStateSelection] = useState({label: "", abbr: "", genre: ""});
   const [filterRestBasedOnFilter, setRestBasedOnFilter] = useState([]);
-  const [tempFilterList, setTempFilterList] = useState([]);
+  const [filterSelection, setStateSelection] = useState({label: "", abbr: "", genre: ""});
+  const [loading, setLoading] = useState(false);
+  const [restaurants, setRestaurants] = useState([]);
   const [restaurantsPerPage] = useState(10);
+  const [searchValue, setSearchValue] = useState("");
+  const [tempFilterList, setTempFilterList] = useState([]);
 
   // Fetch restaurant data
   useEffect(() => {
@@ -178,6 +180,38 @@ const Dashboard = () => {
     }
   }
 
+  // Set search value to state
+  const handleTextInput = e => {
+    let searchValue = e.target.value;
+    setSearchValue(searchValue);
+  }
+
+  // Handle restaurant search
+  const handleSearch = e => {
+    let results = [];
+    if(e.key === "Enter") {
+      let searchValue = e.target.value;
+
+      results = restaurants.filter(obj => {
+        if(obj.genre.toLowerCase().includes(searchValue.toLowerCase())) {
+           return obj;
+        } else if (obj.city.toLowerCase().includes(searchValue.toLowerCase())) {
+          return obj;
+        } else if (obj.name.toLowerCase().includes(searchValue.toLowerCase())) {
+          return obj;
+        } else return;
+      })
+      return setRestBasedOnFilter(results);
+    }
+  }
+
+  // Clear search results
+  const clearSearch = (e) => {
+    e.preventDefault();
+    setSearchValue("");
+    setRestBasedOnFilter([]);
+  }
+
   // Total restaurant amount of pagination based on filters settings
   const totalRestaurantsAmount = filterSelection.abbr || (filterSelection.abbr && filterSelection.genre) || filterSelection.genre
     ? filterRestBasedOnFilter.length
@@ -188,6 +222,27 @@ const Dashboard = () => {
       <span className="dashboard__dropdown--container">
         <h1 className="dashboard--device-title">Restaurants</h1>
         <div className="dashboard__filter--container">
+          {loading ? (<SkeletonText />) : (
+            <div className="dashboard__search--wrapper">
+              <Search16 className="search__icon"/>
+              <input
+                className="dashboard__search-input"
+                role="searchbox"
+                autoComplete="off"
+                labeltext=""
+                placeholder="Search..."
+                onKeyDown={e => handleSearch(e)}
+                onChange={e => handleTextInput(e)}
+                value={searchValue}
+              />
+              <button
+                className={searchValue ? "search__close-icon--display" :  "search__close-icon--hide"}
+                onClick={e => clearSearch(e)}
+              >
+                <Close16 className="search__close-icon"/>
+              </button>
+            </div>
+          )}
           {loading ? (<DropdownSkeleton />) : (
             <Dropdown
               id="dashboard__dropdown--states"

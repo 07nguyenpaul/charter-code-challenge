@@ -24,7 +24,7 @@
   }
 
   tbody {
-    background-color: #f4f4f4;
+    background-color: $background-gray;
     height: 48px;
   }
 
@@ -62,6 +62,65 @@
     .dashboard__filter--container {
       align-items: center;
       display: flex;
+
+      .dashboard__search-input {
+        .bx--search-input {
+          height: 2.5rem;
+        }
+
+        .bx--search-close {
+          height: 2.5rem;
+          width: 2.5rem;
+        }
+      }
     }
+  }
+}
+
+// Search bar styles
+.dashboard__search--wrapper {
+  align-items: center;
+  background-color: $background-gray;
+  border-bottom: 1px solid $border-gray;
+  display: flex;
+  height: 2.5rem;
+  max-width: 237px;
+
+  .search__icon {
+    fill: #616161;
+    margin: 0 16px;
+  }
+
+  .dashboard__search-input {
+    background-color: $background-gray;
+    border: none;
+    border-bottom: 1px solid $border-gray;
+    font-family: $primary-font;
+    font-size: 14px;
+    height: 2.5rem;
+  }
+
+  .dashboard__search-input:focus,
+  .search__close-icon--display:focus {
+    outline: none;
+  }
+
+  .search__close-icon--display {
+    background-color: $background-gray;
+    border-bottom: 1px solid $border-gray;
+    border-left: 0;
+    border-right: 0;
+    border-top: 0;
+    height: 2.5rem;
+    width: 2.5rem;
+  }
+
+  .search__close-icon--display:hover {
+    background-color: $hover-gray;
+    border-bottom: 1px solid $border-gray;
+  }
+
+  .search__close-icon--hide {
+    display: none;
   }
 }
