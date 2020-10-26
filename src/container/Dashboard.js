@@ -200,6 +200,8 @@ const Dashboard = () => {
   // Handle restaurant search
   const handleSearch = e => {
     let results = [];
+    setCurrentPage(1);
+
     if(e.key === "Enter") {
       let value = e.target.value;
 
