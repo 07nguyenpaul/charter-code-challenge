@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { DataTableSkeleton, Dropdown, DropdownSkeleton, SkeletonText } from 'carbon-components-react'
-import { Close16, Search16 } from '@carbon/icons-react';
 import PropTypes from 'prop-types';
 
 import { states, genres } from '../constants';
 import Pagination from '../components/Pagination';
+import SearchBar from '../components/SearchBar';
 import RestaurantData from '../service/fetchData';
 
 import '../styles/Dashboard.scss';
@@ -237,26 +237,12 @@ const Dashboard = () => {
         <h1 className="dashboard--device-title">Restaurants</h1>
         <div className="dashboard__filter--container">
           {loading ? (<SkeletonText />) : (
-            <div className="dashboard__search--wrapper">
-              <Search16 className="search__icon"/>
-              <input
-                type="text"
-                className="dashboard__search-input"
-                role="searchbox"
-                autoComplete="off"
-                labeltext=""
-                placeholder="Search..."
-                onKeyDown={e => handleSearch(e)}
-                onChange={e => handleTextInput(e)}
-                value={searchValue}
-              />
-              <button
-                className={searchValue ? "search__close-icon--display" :  "search__close-icon--hide"}
-                onClick={e => clearSearch(e)}
-              >
-                <Close16 className="search__close-icon"/>
-              </button>
-            </div>
+            <SearchBar
+              searchValue={searchValue}
+              handleSearch={handleSearch}
+              handleTextInput={handleTextInput}
+              clearSearch={clearSearch}
+            />
           )}
           {loading ? (<DropdownSkeleton />) : (
             <Dropdown
