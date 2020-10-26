@@ -48,12 +48,8 @@ const Dashboard = () => {
   }
 
   // Alphabetize restaurant names before initial render
-  const alphabetizeRestaurantNames = () => {
-    const restaurantList = filterRestBasedOnFilter && filterRestBasedOnFilter.length > 0
-      ? filterRestBasedOnFilter
-      : restaurants;
-
-    return restaurantList.sort((a, b) => {
+  const alphabetizeRestaurantNames = (listOfRestaurants) => {
+    return listOfRestaurants.sort((a, b) => {
       let firstRest = a.name.toUpperCase();
       let secondRest = b.name.toUpperCase();
 
@@ -87,24 +83,33 @@ const Dashboard = () => {
     const indexOfLastRestaurant = currentPage * restaurantsPerPage;
     const indexOfFirstRestaurant = indexOfLastRestaurant - restaurantsPerPage;
 
-    if (restaurants && restaurants.length > 0 && !filterSelection.abbr) {
-      // Refactor to remove repetitiveness
-      alphaRestList = alphabetizeRestaurantNames();
+    // Default render of restuarant list with no search value and no filters
+    if (!filterSelection.abbr && !searchValue && !filterSelection.genre) {
+      alphaRestList = alphabetizeRestaurantNames(restaurants);
       const currentRestaurants = alphaRestList.slice(indexOfFirstRestaurant, indexOfLastRestaurant);
 
       return showRestaurantData(currentRestaurants);
-    } else if (filterRestBasedOnFilter && filterRestBasedOnFilter.length > 0 && filterSelection.abbr) {
-      alphaRestList = alphabetizeRestaurantNames();
+    } else if (filterRestBasedOnFilter && filterRestBasedOnFilter.length > 0) {
+      // Render restuarant list with filters
+      alphaRestList = alphabetizeRestaurantNames(filterRestBasedOnFilter);
       const currentRestaurants = alphaRestList.slice(indexOfFirstRestaurant, indexOfLastRestaurant);
 
       return showRestaurantData(currentRestaurants);
-    } else {
+    } else if ((filterRestBasedOnFilter && filterRestBasedOnFilter.length <= 0) && (searchValue || filterSelection.abbr)) {
+      // Render no results if there isn't a match with search value or filter
       return (
         <tr>
-          <td colSpan="6">No Results found in {filterSelection.label}. Select another state.</td>
+          <td colSpan="6">{searchValue ? "No results found." : `No Results found in ${filterSelection.label}. Select another state.`}</td>
         </tr>
       );
-    }
+    } else {
+      // Default render for no results
+      return (
+        <tr>
+          <td colSpan="6">No results found.</td>
+        </tr>
+      );
+    };
   };
 
   // Handle pagination
@@ -117,11 +122,12 @@ const Dashboard = () => {
     // Resetting state filter
     if(selectedState === "ALL") {
       const filterSelectionCondition =
-        filterSelection.abbr !== e.selectedItem.label &&
-        filterSelection.label !== e.selectedItem.abbr &&
-        filterSelection.genre;
+        (((filterSelection.abbr !== e.selectedItem.label &&
+        filterSelection.label !== e.selectedItem.abbr) &&
+        filterSelection.genre) || searchValue);
 
       if(filterSelectionCondition) {
+        // Reset state filter but tempFilterList is kept to filter genre or search
         setStateSelection({...filterSelection, label: "", abbr: ""});
         setRestBasedOnFilter(tempFilterList)
       } else {
@@ -129,10 +135,13 @@ const Dashboard = () => {
         setRestBasedOnFilter([]);
       }
     } else {
-      let filteredList = restaurants.filter(state => selectedState === state.state);
+      const restaurantList = searchValue || filterSelection.genre ? tempFilterList : restaurants;
+      let filteredList = restaurantList.filter(state => selectedState === state.state);
       const stateFilterSelection = filterSelection.label === e.selectedItem.label && filterSelection.abbr === e.selectedItem.abbr;
 
-      setTempFilterList(filteredList);
+      if(!searchValue) {
+        setTempFilterList(filteredList);
+      }
 
       if(stateFilterSelection) {
         return;
@@ -145,13 +154,14 @@ const Dashboard = () => {
   }
 
   // Filter by genre
-  const handleGenreSelection = (value) => {
+  const handleGenreSelection = async (value) => {
     const selectedGenre = value && value.selectedItem ? value.selectedItem.label : value;
 
     // Resetting genre filter
     if(selectedGenre === "All") {
       // Resetting genre but still have state filter selected
-      if(filterSelection.abbr && filterSelection.label) {
+      if((filterSelection.abbr && filterSelection.label) || searchValue) {
+        setStateSelection({...filterSelection, genre: ""});
         setRestBasedOnFilter(tempFilterList);
       } else {
         setStateSelection({...filterSelection, genre: ""});
@@ -159,7 +169,7 @@ const Dashboard = () => {
       }
     } else {
       const restaurantList =
-        filterSelection.label && filterSelection.abbr ? filterRestBasedOnFilter : restaurants;
+        (filterSelection.label && filterSelection.abbr) || searchValue ? tempFilterList : restaurants;
       // Temporarily store restaurant list for initial filtering or reset of filters
       setTempFilterList(restaurantList);
 
@@ -182,6 +192,7 @@ const Dashboard = () => {
 
   // Set search value to state
   const handleTextInput = e => {
+    e.preventDefault();
     let searchValue = e.target.value;
     setSearchValue(searchValue);
   }
@@ -190,17 +201,18 @@ const Dashboard = () => {
   const handleSearch = e => {
     let results = [];
     if(e.key === "Enter") {
-      let searchValue = e.target.value;
+      let value = e.target.value;
 
       results = restaurants.filter(obj => {
-        if(obj.genre.toLowerCase().includes(searchValue.toLowerCase())) {
+        if(obj.genre.toLowerCase().includes(value.toLowerCase())) {
            return obj;
-        } else if (obj.city.toLowerCase().includes(searchValue.toLowerCase())) {
+        } else if (obj.city.toLowerCase().includes(value.toLowerCase())) {
           return obj;
-        } else if (obj.name.toLowerCase().includes(searchValue.toLowerCase())) {
+        } else if (obj.name.toLowerCase().includes(value.toLowerCase())) {
           return obj;
         } else return;
       })
+      setTempFilterList(results);
       return setRestBasedOnFilter(results);
     }
   }
@@ -213,7 +225,7 @@ const Dashboard = () => {
   }
 
   // Total restaurant amount of pagination based on filters settings
-  const totalRestaurantsAmount = filterSelection.abbr || (filterSelection.abbr && filterSelection.genre) || filterSelection.genre
+  const totalRestaurantsAmount = filterSelection.abbr || (filterSelection.abbr && filterSelection.genre) || filterSelection.genre || searchValue
     ? filterRestBasedOnFilter.length
     : restaurants.length;
 
@@ -226,6 +238,7 @@ const Dashboard = () => {
             <div className="dashboard__search--wrapper">
               <Search16 className="search__icon"/>
               <input
+                type="text"
                 className="dashboard__search-input"
                 role="searchbox"
                 autoComplete="off"
